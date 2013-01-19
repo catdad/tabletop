@@ -1,6 +1,7 @@
 (function(global) {
   "use strict";
-
+  
+  /* Array.indexOf fix for IE */
   if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (obj, fromIndex) {
       if (fromIndex == null) {
@@ -51,8 +52,9 @@
     }
 
     if(!this.key) {
-      alert("You need to pass Tabletop a key!");
-      return;
+      this.log("You need to pass Tabletop a key!");
+	  this.callback("No key passed to Tabletop");
+	  return;
     }
 
     this.log("Initializing with key " + this.key);
@@ -99,7 +101,8 @@
       var script = document.createElement('script'),
           self = this,
           callbackName = 'tt' + (+new Date()) + (Math.floor(Math.random()*100000));
-      // Create a temp callback which will get removed once it has executed,
+      
+	  // Create a temp callback which will get removed once it has executed,
       // this allows multiple instances of Tabletop to coexist.
       Tabletop.callbacks[ callbackName ] = function () {
         var args = Array.prototype.slice.call( arguments, 0 );
@@ -107,6 +110,7 @@
         script.parentNode.removeChild(script);
         delete Tabletop.callbacks[callbackName];
       };
+	  
       url = url + "&callback=" + 'Tabletop.callbacks.' + callbackName;
       script.src = url;
       document.getElementsByTagName('script')[0].parentNode.appendChild(script);
@@ -177,6 +181,11 @@
       }
 
       this.sheetsToLoad = toInject.length;
+	  
+	  //send error message to callback if wanted sheets do not exist
+	  if(this.sheetsToLoad === 0)
+		this.callback('The wanted sheets were not found.');
+
       for(i = 0, ilen = toInject.length; i < ilen; i++) {
         this.injectScript(toInject[i], this.loadSheet);
       }
@@ -190,13 +199,11 @@
     sheets: function(sheetName) {
       if(typeof sheetName === "undefined")
         return this.models;
-      else
-        if(typeof(this.models[ sheetName ]) === "undefined") {
-          // alert( "Can't find " + sheetName );
-          return;
-        } else {
-          return this.models[ sheetName ];
-        }
+      else if(typeof(this.models[ sheetName ]) === "undefined") {
+          this.log( "Can't find " + sheetName );
+		  return;
+        } else
+            return this.models[ sheetName ];
     },
 
     /*
@@ -205,14 +212,17 @@
       Used as a callback for the list-based JSON
     */
     loadSheet: function(data) {
-      var model = new Tabletop.Model( { data: data, 
-                                    parseNumbers: this.parseNumbers,
-                                    postProcess: this.postProcess,
-                                    tabletop: this } );
+      var model = new Tabletop.Model({
+		data: data, 
+        parseNumbers: this.parseNumbers,
+        postProcess: this.postProcess,
+        tabletop: this
+	  });
+	  
       this.models[ model.name ] = model;
-      if(this.model_names.indexOf(model.name) == -1) {
+      if(this.model_names.indexOf(model.name) == -1)
         this.model_names.push(model.name);
-      }
+		
       this.sheetsToLoad--;
       if(this.sheetsToLoad === 0)
         this.doCallback();
