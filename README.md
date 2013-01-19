@@ -4,6 +4,8 @@
 
 **Tabletop.js** takes a Google Spreadsheet and makes it easily accessible through JavaScript. With zero dependencies!
 
+## Callback change
+
 This is the original way of setting up Tabletop in your file:
 
     function init() {
@@ -31,6 +33,10 @@ The first parameter of the `callback` will be an error. If everything works, thi
         }
     }
     ...
+
+## parseNumbers change
+
+If `parseNumbers` is set to `true`, aside from numbers, it will also recognize the string values 'null', 'Null', and 'NULL' as `null` rather than a string value (they will now test as `false`).
 
 ## Credits (original from [jsoma](https://github.com/jsoma))
 
