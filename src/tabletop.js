@@ -279,7 +279,9 @@
         var cell = source[ "gsx$" + this.column_names[j] ];
         if(options.parseNumbers && cell.$t !== '' && !isNaN(cell.$t))
           element[ this.column_names[j] ] = +cell.$t;
-        else
+        else if (cell.$t === 'null' || cell.$t === 'Null' || cell.$t === 'NULL')
+		  element[ this.column_names[j] ] = null;
+		else
           element[ this.column_names[j] ] = cell.$t;
       }
       if(element.rowNumber === undefined)
