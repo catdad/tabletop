@@ -113,6 +113,8 @@
 	  
       url = url + "&callback=" + 'Tabletop.callbacks.' + callbackName;
       script.src = url;
+	  //check for loading errors
+	  script.addEventListener('error', function(ev){ that.callback("loading error"); })	
       document.getElementsByTagName('script')[0].parentNode.appendChild(script);
     },
 
