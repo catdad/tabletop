@@ -98,7 +98,8 @@
       Let's be plain-Jane and not use jQuery or anything.
     */
     injectScript: function(url, callback) {
-      var script = document.createElement('script'),
+      var that = this;
+	  var script = document.createElement('script'),
           self = this,
           callbackName = 'tt' + (+new Date()) + (Math.floor(Math.random()*100000));
       
